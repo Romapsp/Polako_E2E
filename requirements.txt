@@ -1,3 +1,4 @@
+python-dotenv
 certifi==2026.4.22
 charset-normalizer==3.4.7
 greenlet==3.5.0
