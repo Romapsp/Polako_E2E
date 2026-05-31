@@ -1,4 +1,5 @@
 from BugBusters.pages.base_page import BasePage
+from playwright.sync_api import expect
 
 
 class RegistrationPage(BasePage):
@@ -29,7 +30,15 @@ class RegistrationPage(BasePage):
             'form button[type="submit"]'
         )
 
-        self.last_api_response = None
+
+        self.avatar_circle = page.locator(
+            'header span.text.m-auto.text-white'
+        )
+        self.multilang_error_message = page.locator('.bg-fault + p'
+        )
+
+        self.error_popup_title = page.locator('div.absolute.right-0 > p.text-2xl'
+        )
 
     def navigate_to_registration(self):
         self.login_btn.first.wait_for(state="visible", timeout=5000)
@@ -49,55 +58,20 @@ class RegistrationPage(BasePage):
 
     def register(self, name, email, password):
         self.fill_registration_form(name, email, password)
+        self.submit_registration()
 
+    def should_have_avatar_circle(self, user_name=""):
+        expect(self.avatar_circle).to_be_visible(timeout=5000)
 
-        with self.page.expect_response(
-                lambda response: (
-                        "/api/auth/signup" in response.url
-                        and response.request.method == "POST"
-                ),
-                timeout=5000
-        ) as response_info:
-            self.submit_registration()
-        self.last_api_response = response_info.value
+        if user_name:
+            first_letter = user_name[0].upper()
+            expect(self.avatar_circle).to_have_text(first_letter)
+        else:
+            expect(self.avatar_circle).not_to_be_empty()
 
-    def is_registration_successful(self):
-        return (
-                self.last_api_response is not None
-                and self.last_api_response.status in [200, 201, 204]
-        )
+    def should_have_registration_error(self):
+        expect(self.error_popup_title).to_be_visible(timeout=5000)
+        expect(self.error_popup_title).not_to_be_empty()
 
-    def get_error_message(self):
-        try:
-            if self.last_api_response and self.last_api_response.status >= 400:
-                response_json = self.last_api_response.json()
-
-                if "errors" in response_json and len(response_json["errors"]) > 0:
-                    clean_error = response_json["errors"][0].get("message")
-
-                    print(
-                        f"\n[PLAYWRIGHT API LOG] "
-                        f"Распакован чистый текст ошибки: '{clean_error}'"
-                    )
-
-                    return clean_error
-
-                return (
-                        response_json.get("message")
-                        or response_json.get("error")
-                        or str(response_json)
-                )
-
-        except Exception as e:
-            print(
-                f"\n[PLAYWRIGHT API LOG] "
-                f"Не удалось прочитать JSON ответа: {e}"
-            )
-
-            try:
-                return self.last_api_response.text()
-
-
-            except Exception:
-
-                return ""
+        expect(self.multilang_error_message).to_be_visible(timeout=5000)
+        expect(self.multilang_error_message).not_to_be_empty()

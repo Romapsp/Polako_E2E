@@ -44,4 +44,5 @@ def login_user_data(app):
     return {
         "email": app.data.EMAIL,
         "password": app.data.PASSWORD,
+        "name": app.data.USER_NAME,
     }

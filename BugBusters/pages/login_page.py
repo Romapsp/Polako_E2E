@@ -6,7 +6,7 @@ class LoginPage(BasePage):
     def __init__(self, page):
         super().__init__(page)
 
-        self.login_button = page.locator(
+        self.sign_in = page.locator(
             'header button:has(use[href*="phi-caret-down-16"])'
         )
         self.email_input = page.locator('input[name="email"]')
@@ -14,8 +14,12 @@ class LoginPage(BasePage):
         self.submit_button = page.locator('button[type="submit"]')
         self.profile_link = page.locator('header a').first
 
+        self.avatar_circle = page.locator(
+            'header span.text.m-auto.text-white'
+        )
+
     def open_login_form(self):
-        self.login_button.first.click()
+        self.sign_in.first.click()
 
     def login(self, email, password):
         self.email_input.wait_for(state="visible")
@@ -25,3 +29,12 @@ class LoginPage(BasePage):
 
     def should_have_profile_link(self):
         expect(self.profile_link).to_be_visible()
+
+    def should_have_avatar_circle(self, user_name=""):
+        expect(self.avatar_circle).to_be_visible(timeout=5000)
+
+        if user_name:
+            first_letter = user_name[0].upper()
+            expect(self.avatar_circle).to_have_text(first_letter)
+        else:
+            expect(self.avatar_circle).not_to_be_empty()
