@@ -8,7 +8,7 @@ def test_profile_sidebar_tabs_are_clickable(authorized_page):
     page = authorized_page
     profile_page = ProfilePage(page)
 
-    profile_page.close_whats_new_popup()
+
 
     expect(page).to_have_url(re.compile(r"/en/user/personal-information"))
     expect(profile_page.profile_tab).to_be_visible()
@@ -19,8 +19,6 @@ def test_profile_sidebar_tabs_are_clickable(authorized_page):
 
         tab.click()
         page.wait_for_load_state("networkidle")
-
-        profile_page.close_whats_new_popup()
 
         expect(page).to_have_url(re.compile(expected_url))
         expect(page.locator("body")).to_be_visible()

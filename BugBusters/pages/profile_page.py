@@ -1,14 +1,23 @@
 from BugBusters.pages.base_page import BasePage
 
 
-from BugBusters.pages.base_page import BasePage
-
-
 class ProfilePage(BasePage):
     def __init__(self, page):
         super().__init__(page)
 
         self.first_name = page.locator('input[name="first_name"]')
+        self.last_name = page.locator('input[name="last_name"]')
+        self.email = page.locator('input[name="email"]')
+        self.phone = page.locator('input[name="phone"]')
+
+        self.instagram = page.locator('input[name="instagram"]')
+
+        self.telegram = page.locator('input[name="telegram"]')
+
+        self.new_password = page.locator('input[name="new_password"]')
+        self.confirm_password = page.locator('input[name="confirm_password"]')
+
+        self.save_button = page.get_by_role("button", name="Save")
 
         self.profile_tab = page.locator('a[href*="/user/personal-information"]')
         self.purchases_tab = page.locator('a[href*="/user/purchases"]')
@@ -26,7 +35,57 @@ class ProfilePage(BasePage):
 
     def update_name(self, name):
         self.first_name.fill(name)
-        self.page.click('button.save')
+        self.save_button.click()
+        self.page.wait_for_load_state("networkidle")
+
+    def get_first_name_value(self):
+        return self.first_name.input_value()
+
+    def update_last_name(self, last_name):
+        self.last_name.fill(last_name)
+        self.save_button.click()
+        self.page.wait_for_load_state("networkidle")
+
+    def get_last_name_value(self):
+        return self.last_name.input_value()
+
+    def update_email(self, email):
+        self.email.fill(email)
+        self.save_button.click()
+        self.page.wait_for_load_state("networkidle")
+
+    def get_email_value(self):
+        return self.email.input_value()
+
+    def update_phone(self, phone):
+        self.phone.fill(phone)
+        self.save_button.click()
+        self.page.wait_for_load_state("networkidle")
+
+    def get_phone_value(self):
+        return self.phone.input_value()
+
+    def update_instagram(self, instagram):
+        self.instagram.fill(instagram)
+        self.save_button.click()
+        self.page.wait_for_load_state("networkidle")
+
+    def get_instagram_value(self):
+        return self.instagram.input_value()
+
+    def update_telegram(self, telegram):
+        self.telegram.fill(telegram)
+        self.save_button.click()
+        self.page.wait_for_load_state("networkidle")
+
+    def get_telegram_value(self):
+        return self.telegram.input_value()
+
+    def update_password(self, new_password, confirm_password):
+        self.new_password.fill(new_password)
+        self.confirm_password.fill(confirm_password)
+        self.save_button.click()
+        self.page.wait_for_load_state("networkidle")
 
     def get_sidebar_tabs(self):
         return [
@@ -43,9 +102,3 @@ class ProfilePage(BasePage):
             (self.publications_tab, "/en/user/publications"),
             (self.management_tab, "/en/user/management"),
         ]
-
-    def close_whats_new_popup(self):
-        close_button = self.page.get_by_role("button", name="Close")
-
-        if close_button.is_visible():
-            close_button.click()

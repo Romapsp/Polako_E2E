@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 
 from BugBusters.app import App
 from BugBusters.data.constants import Constants
+from BugBusters.utils.popups import close_whats_new_popup
 
 load_dotenv(dotenv_path=os.path.join(os.path.dirname(os.path.dirname(__file__)), '.env'))
 
@@ -94,6 +95,8 @@ def authorized_page(browser, login_user_data):
 
     page.goto(f"{Constants.BASE_URL}/user/personal-information")
     page.wait_for_load_state("networkidle")
+
+    close_whats_new_popup(page)
 
     print("AUTHORIZED PAGE URL:", page.url)
 
