@@ -1,5 +1,5 @@
+from playwright.sync_api import Page
 import os, uuid, pytest
-
 from dotenv import load_dotenv
 
 from BugBusters.app import App
@@ -8,10 +8,11 @@ from BugBusters.data.constants import Constants
 load_dotenv(dotenv_path=os.path.join(os.path.dirname(os.path.dirname(__file__)), '.env'))
 
 
-@pytest.fixture
-def app(page):
+@pytest.fixture(autouse=True)
+def app(page: Page):
     page.goto(Constants.BASE_URL)
-    return App(page)
+
+    yield App(page)
 
 
 @pytest.fixture(scope="session")
@@ -57,13 +58,11 @@ def login_user_data(app):
 
 @pytest.fixture
 def authorized_page(browser, login_user_data):
-    site_url = "https://stg.polakohedonist.club"
-
     context = browser.new_context(
-        base_url=site_url,
+        base_url=Constants.SITE_URL,
         extra_http_headers={
-            "Origin": site_url,
-            "Referer": f"{site_url}/ru",
+            "Origin": Constants.SITE_URL,
+            "Referer": Constants.BASE_URL,
         }
     )
 
@@ -84,7 +83,7 @@ def authorized_page(browser, login_user_data):
 
     page = context.new_page()
 
-    page.goto(f"{site_url}/ru")
+    page.goto(Constants.BASE_URL)
     page.evaluate(
         """token => {
             localStorage.setItem("access_token", token);
@@ -93,7 +92,7 @@ def authorized_page(browser, login_user_data):
         access_token
     )
 
-    page.goto(f"{site_url}/ru/user/personal-information")
+    page.goto(f"{Constants.BASE_URL}/user/personal-information")
     page.wait_for_load_state("networkidle")
 
     print("AUTHORIZED PAGE URL:", page.url)

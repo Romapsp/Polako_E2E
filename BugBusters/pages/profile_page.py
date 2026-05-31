@@ -10,19 +10,19 @@ class ProfilePage(BasePage):
 
         self.first_name = page.locator('input[name="first_name"]')
 
-        self.profile_tab = page.locator('a[href*="/ru/user/personal-information"]')
-        self.purchases_tab = page.locator('a[href*="/ru/user/purchases"]')
-        self.balance_tab = page.locator('a[href*="/ru/user/balance"]')
+        self.profile_tab = page.locator('a[href*="/user/personal-information"]')
+        self.purchases_tab = page.locator('a[href*="/user/purchases"]')
+        self.balance_tab = page.locator('a[href*="/user/balance"]')
 
-        self.company_tab = page.locator('a[href*="/ru/user/company-settings"]')
-        self.events_tab = page.locator('a[href*="/ru/user/events"]')
-        self.contract_data_tab = page.locator('a[href*="/ru/user/contract-data"]')
-        self.contracts_tab = page.locator('a[href*="/ru/user/contracts"]')
-        self.reports_tab = page.locator('a[href*="/ru/user/reports"]')
-        self.qr_code_tab = page.locator('a[href*="/ru/user/qr-generator"]')
-        self.withdraw_tab = page.locator('a[href*="/ru/user/withdrawal"]')
-        self.publications_tab = page.locator('a[href*="/ru/user/publications"]')
-        self.management_tab = page.locator('a[href*="/ru/user/management"]')
+        self.company_tab = page.locator('a[href*="/user/company-settings"]')
+        self.events_tab = page.locator('a[href*="/user/events"]')
+        self.contract_data_tab = page.locator('a[href*="/user/contract-data"]')
+        self.contracts_tab = page.locator('a[href*="/user/contracts"]')
+        self.reports_tab = page.locator('a[href*="/user/reports"]')
+        self.qr_code_tab = page.locator('a[href*="/user/qr-generator"]')
+        self.withdraw_tab = page.locator('a[href*="/user/withdrawal"]')
+        self.publications_tab = page.locator('a[href*="/user/publications"]')
+        self.management_tab = page.locator('a[href*="/user/management"]')
 
     def update_name(self, name):
         self.first_name.fill(name)
@@ -30,16 +30,22 @@ class ProfilePage(BasePage):
 
     def get_sidebar_tabs(self):
         return [
-            (self.profile_tab, "/ru/user/personal-information"),
-            (self.purchases_tab, "/ru/user/purchases"),
-            (self.balance_tab, "/ru/user/balance"),
-            (self.company_tab, "/ru/user/company-settings"),
-            (self.events_tab, "/ru/user/events"),
-            (self.contract_data_tab, "/ru/user/contract-data"),
-            (self.contracts_tab, "/ru/user/contracts"),
-            (self.reports_tab, "/ru/user/reports"),
-            (self.qr_code_tab, "/ru/user/qr-generator"),
-            (self.withdraw_tab, "/ru/user/withdrawal"),
-            (self.publications_tab, "/ru/user/publications"),
-            (self.management_tab, "/ru/user/management"),
+            (self.profile_tab, "/en/user/personal-information"),
+            (self.purchases_tab, "/en/user/purchases"),
+            (self.balance_tab, "/en/user/balance"),
+            (self.company_tab, "/en/user/company-settings"),
+            (self.events_tab, "/en/user/events"),
+            (self.contract_data_tab, "/en/user/contract-data"),
+            (self.contracts_tab, "/en/user/contracts"),
+            (self.reports_tab, "/en/user/reports"),
+            (self.qr_code_tab, "/en/user/qr-generator"),
+            (self.withdraw_tab, "/en/user/withdrawal"),
+            (self.publications_tab, "/en/user/publications"),
+            (self.management_tab, "/en/user/management"),
         ]
+
+    def close_whats_new_popup(self):
+        close_button = self.page.get_by_role("button", name="Close")
+
+        if close_button.is_visible():
+            close_button.click()
