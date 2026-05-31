@@ -1,0 +1,44 @@
+name: BugBusters Playwright E2E Runs
+
+
+on:
+  push:
+    branches: [ "HW_3_Auto_BugBusters" ]
+  pull_request:
+    branches: [ "develop-bb" ]
+
+jobs:
+  run-tests:
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+
+      - name: Set up Python 3.13
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+          cache: 'pip'
+
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+
+      - name: Install Playwright Browsers
+        run: playwright install --with-deps
+
+
+      - name: Create .env file from single secret
+        run: |
+          echo "${{ secrets.ENV_FILE }}" > .env
+
+
+      - name: Run Pytest Automation
+        run: pytest -v
