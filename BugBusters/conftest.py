@@ -103,3 +103,5 @@ def authorized_page(browser, login_user_data):
     yield page
 
     context.close()
+        "name": app.data.USER_NAME,
+    }
