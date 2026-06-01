@@ -8,6 +8,9 @@ from BugBusters.utils.popups import close_whats_new_popup
 
 load_dotenv(dotenv_path=os.path.join(os.path.dirname(os.path.dirname(__file__)), '.env'))
 
+if os.getenv("CI") == "true":
+    os.environ.pop("PWDEBUG", None)
+
 
 @pytest.fixture
 def app(page: Page):
