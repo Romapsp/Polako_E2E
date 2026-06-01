@@ -28,7 +28,7 @@ def test_successfully_update_password(authorized_page):
     expect(profile_page.confirm_password).to_have_value("")
 
 
-def test_failed_update_phone(authorized_page):
+def test_failed_update_password(authorized_page):
     profile_page = ProfilePage(authorized_page)
 
     new_password = "qwertyqwerty*"

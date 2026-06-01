@@ -5,7 +5,7 @@ on:
   push:
     branches: [ "HW_3_Auto_BugBusters" ]
   pull_request:
-    branches: [ "develop-bb" ]
+    branches: [ "master" ]
 
 jobs:
   run-tests:

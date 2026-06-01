@@ -6,7 +6,7 @@ from BugBusters.utils.common_actions import reload_profile_page
 def test_successfully_update_first_name(authorized_page):
     profile_page = ProfilePage(authorized_page)
 
-    profile_page.first_name.fill("Kate")
+    profile_page.first_name.fill("Sandra")
     profile_page.save_button.click()
 
 def test_failed_update_first_name(authorized_page):

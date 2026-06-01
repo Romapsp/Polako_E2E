@@ -9,7 +9,7 @@ from BugBusters.utils.popups import close_whats_new_popup
 load_dotenv(dotenv_path=os.path.join(os.path.dirname(os.path.dirname(__file__)), '.env'))
 
 
-@pytest.fixture(autouse=True)
+@pytest.fixture
 def app(page: Page):
     page.goto(Constants.BASE_URL)
 
@@ -54,6 +54,7 @@ def login_user_data(app):
     return {
         "email": app.data.EMAIL,
         "password": app.data.PASSWORD,
+        "name": app.data.USER_NAME,
     }
 
 
@@ -103,5 +104,5 @@ def authorized_page(browser, login_user_data):
     yield page
 
     context.close()
-        "name": app.data.USER_NAME,
-    }
+
+

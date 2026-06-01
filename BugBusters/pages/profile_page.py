@@ -46,6 +46,7 @@ class ProfilePage(BasePage):
         self.save_button.click()
         self.page.wait_for_load_state("networkidle")
 
+
     def get_last_name_value(self):
         return self.last_name.input_value()
 
@@ -60,7 +61,11 @@ class ProfilePage(BasePage):
     def update_phone(self, phone):
         self.phone.fill(phone)
         self.save_button.click()
-        self.page.wait_for_load_state("networkidle")
+
+        from playwright.sync_api import expect
+        expect(self.page.locator("text='Profile updated'")).to_be_visible()
+
+
 
     def get_phone_value(self):
         return self.phone.input_value()
@@ -102,3 +107,17 @@ class ProfilePage(BasePage):
             (self.publications_tab, "/en/user/publications"),
             (self.management_tab, "/en/user/management"),
         ]
+
+    def save_profile(self):
+        with self.page.expect_response(
+                lambda r: (
+                        r.url.endswith("/api/users/me")
+                        and r.request.method == "PATCH"
+                ),
+                timeout=10000
+        ) as response_info:
+            self.save_button.click()
+
+        response = response_info.value
+
+        assert response.ok, f"Failed to save profile: {response.status} {response.text()}"

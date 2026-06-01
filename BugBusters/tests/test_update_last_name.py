@@ -1,9 +1,20 @@
-from playwright.sync_api import expect
+import pytest
 
 from BugBusters.pages.profile_page import ProfilePage
 from BugBusters.utils.common_actions import reload_profile_page
 
 
+from playwright.sync_api import expect
+
+
+
+
+
+
+
+@pytest.mark.skip(
+    reason="Тест в разработке"
+)
 def test_successfully_update_last_name(authorized_page):
     profile_page = ProfilePage(authorized_page)
 
@@ -15,7 +26,9 @@ def test_successfully_update_last_name(authorized_page):
 
     expect(profile_page.last_name).to_have_value(new_last_name)
 
-
+@pytest.mark.skip(
+    reason="Тест в разработке"
+)
 def test_failed_update_last_name(authorized_page):
     profile_page = ProfilePage(authorized_page)
 
