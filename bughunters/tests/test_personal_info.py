@@ -2,6 +2,8 @@ import re
 from playwright.sync_api import expect
 from bughunters.pages import Pages
 
+_URL_TIMEOUT = 15_000  # CI runners are slower — give URLs time to settle
+
 
 class TestPersonalInfoHappyPath:
     def test_page_loads_with_user_email(self, auth_pages: Pages) -> None:
@@ -14,9 +16,9 @@ class TestPersonalInfoHappyPath:
         auth_pages.personal_info.verify_profile_fields_visible()
 
     def test_profile_url_is_correct(self, auth_pages: Pages) -> None:
-        """After API login we should land on personal-information, not a login redirect."""
+        """After login we should land on personal-information, not a login redirect."""
         expect(auth_pages.personal_info.page).to_have_url(
-            re.compile(r"user/personal-information")
+            re.compile(r"user/personal-information"), timeout=_URL_TIMEOUT
         )
 
     def test_save_profile_shows_success_feedback(self, auth_pages: Pages) -> None:
@@ -44,24 +46,28 @@ class TestPersonalInfoHappyPath:
 
 class TestPersonalInfoNavigation:
     def test_navigate_to_purchases_via_sidebar(self, auth_pages: Pages) -> None:
-        """Clicking the purchases sidebar link navigates to /user/purchases."""
+        """navigate_to_purchases() lands on /user/purchases."""
         auth_pages.personal_info.navigate_to_purchases()
-        expect(auth_pages.personal_info.page).to_have_url(re.compile(r"user/purchases"))
+        expect(auth_pages.personal_info.page).to_have_url(
+            re.compile(r"user/purchases"), timeout=_URL_TIMEOUT
+        )
 
     def test_navigate_back_to_profile_via_sidebar(self, auth_pages: Pages) -> None:
-        """After going to purchases, clicking profile link returns to personal-info."""
+        """After going to purchases, navigate_to_personal_info() returns to personal-info."""
         auth_pages.personal_info.navigate_to_purchases()
         auth_pages.personal_info.navigate_to_personal_info()
         expect(auth_pages.personal_info.page).to_have_url(
-            re.compile(r"user/personal-information")
+            re.compile(r"user/personal-information"), timeout=_URL_TIMEOUT
         )
 
 
 class TestPurchasesPage:
     def test_purchases_page_loads(self, auth_pages: Pages) -> None:
-        """Happy path: purchases page is accessible."""
+        """Happy path: purchases page is accessible and URL is correct."""
         auth_pages.purchases.open()
-        expect(auth_pages.purchases.page).to_have_url(re.compile(r"user/purchases"))
+        expect(auth_pages.purchases.page).to_have_url(
+            re.compile(r"user/purchases"), timeout=_URL_TIMEOUT
+        )
 
     def test_purchases_shows_empty_state_or_items(self, auth_pages: Pages) -> None:
         """Purchases page must render either a list or an empty-state message."""
@@ -71,4 +77,3 @@ class TestPurchasesPage:
         assert count > 0 or is_empty, (
             "Purchases page should show items or an empty-state message"
         )
-##

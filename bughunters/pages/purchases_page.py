@@ -32,7 +32,7 @@ class PurchasesPage(BasePage):
 
     def open(self) -> None:
         self.navigate(URLS["purchases"])
-        self.page.wait_for_load_state("domcontentloaded", timeout=15_000)
+        self.page.wait_for_load_state("domcontentloaded", timeout=30_000)
         self._wait_for_csr()
 
     def _wait_for_csr(self) -> None:

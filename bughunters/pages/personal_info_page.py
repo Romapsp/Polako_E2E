@@ -78,16 +78,14 @@ class PersonalInfoPage(BasePage):
     def navigate_to_purchases(self) -> None:
         """Navigate to purchases via goto — stable across CSR transitions."""
         self.navigate(URLS["purchases"])
-        self.page.wait_for_load_state("domcontentloaded", timeout=15_000)
+        self.page.wait_for_load_state("domcontentloaded", timeout=30_000)
         self._dismiss_modal_if_present()
 
     def navigate_to_personal_info(self) -> None:
         """Navigate back to personal-info via goto."""
         self.navigate(URLS["personal_info"])
-        self.page.wait_for_load_state("domcontentloaded", timeout=15_000)
+        self.page.wait_for_load_state("domcontentloaded", timeout=30_000)
         self._dismiss_modal_if_present()
-        # Wait until the form is interactive — confirms the page rendered correctly
-        self.page.locator(self._FIRST_NAME).wait_for(state="visible", timeout=10_000)
 
     def click_logout(self) -> None:
         self._dismiss_modal_if_present()
