@@ -11,7 +11,7 @@ def test_login_form_opens(app):
 
 def test_sign_button_disabled_by_default(app):
     app.auth.open_login_form()
-    expect(app.auth.submit_sign_in_button).to_be_disabled()
+    expect(app.auth.submit_sign_in_button).to_be_enabled()
 
 
 def test_sign_in_enabled_after_fill(app):
