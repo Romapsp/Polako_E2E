@@ -71,4 +71,4 @@ class TestPurchasesPage:
         assert count > 0 or is_empty, (
             "Purchases page should show items or an empty-state message"
         )
-#
+##
