@@ -76,9 +76,13 @@ class PersonalInfoPage(BasePage):
         self.page.locator(self._SAVE_BTN).first.click()
 
     def navigate_to_purchases(self) -> None:
-        """Navigate to purchases via goto."""
+        """Navigate to purchases via goto. Retries once on CI redirect flakiness."""
         self.navigate(URLS["purchases"])
         self.page.wait_for_load_state("domcontentloaded", timeout=30_000)
+        if "purchases" not in self.page.url:
+            self.page.wait_for_timeout(2_000)
+            self.navigate(URLS["purchases"])
+            self.page.wait_for_load_state("domcontentloaded", timeout=30_000)
 
     def navigate_to_personal_info(self) -> None:
         """

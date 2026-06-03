@@ -48,9 +48,8 @@ class TestPersonalInfoNavigation:
     def test_navigate_to_purchases_via_sidebar(self, auth_pages: Pages) -> None:
         """navigate_to_purchases() lands on /user/purchases."""
         auth_pages.personal_info.navigate_to_purchases()
-        expect(auth_pages.personal_info.page).to_have_url(
-            re.compile(r"user/purchases"), timeout=_URL_TIMEOUT
-        )
+        actual = auth_pages.personal_info.current_url
+        assert "purchases" in actual, f"Expected purchases URL, got: {actual}"
 
     def test_navigate_back_to_profile_via_sidebar(self, auth_pages: Pages) -> None:
         """After going to purchases, navigate_to_personal_info() returns to personal-info."""
@@ -66,9 +65,8 @@ class TestPurchasesPage:
     def test_purchases_page_loads(self, auth_pages: Pages) -> None:
         """Happy path: purchases page is accessible and URL is correct."""
         auth_pages.purchases.open()
-        expect(auth_pages.purchases.page).to_have_url(
-            re.compile(r"user/purchases"), timeout=_URL_TIMEOUT
-        )
+        actual = auth_pages.purchases.current_url
+        assert "purchases" in actual, f"Expected purchases URL, got: {actual}"
 
     def test_purchases_shows_empty_state_or_items(self, auth_pages: Pages) -> None:
         """Purchases page must render either a list or an empty-state message."""

@@ -33,6 +33,12 @@ class PurchasesPage(BasePage):
     def open(self) -> None:
         self.navigate(URLS["purchases"])
         self.page.wait_for_load_state("domcontentloaded", timeout=30_000)
+        # In CI the Next.js router sometimes does an intermediate redirect.
+        # Retry once if we ended up on the home page instead of purchases.
+        if "purchases" not in self.page.url:
+            self.page.wait_for_timeout(2_000)
+            self.navigate(URLS["purchases"])
+            self.page.wait_for_load_state("domcontentloaded", timeout=30_000)
         self._wait_for_csr()
 
     def _wait_for_csr(self) -> None:
