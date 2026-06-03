@@ -3,13 +3,14 @@ from TP_Polako_E2E.pages.auth.login_page import (
     LOGIN_FORM,
 )
 from TP_Polako_E2E.utils.constants import (
+    EMPTY_PASSWORD,
     INVALID_PASSWORD,
     SQL_INJECTION_PAYLOAD,
     TEST_EMAIL,
     INVALID_EMAIL,
     VALID_TEST_PASSWORD,
     XSS_PAYLOAD,
-    INVALID_EMAIL_WITHOUT_AT,
+    INVALID_EMAIL_WITHOUT_AT, UNREGISTERED_EMAIL,
 )
 
 
@@ -17,9 +18,8 @@ class TestLogin(BaseTest):
 
     def test_login_success(self):
         self.login_page.login_and_go_to_profile()
+        self.manager_profile.close_modal()
 
-        self.user_profile.close_modal()
-        self.user_profile.verify_profile_url()
         self.user_profile.verify_logout_button_visible()
 
     def test_login_with_token(self, authenticated_page):

@@ -1,6 +1,4 @@
 from typing import Callable
-import re
-from playwright.sync_api import Page, expect
 
 from TP_Polako_E2E.base.base_page import BasePage
 
@@ -27,8 +25,6 @@ CHANGE_PASSWORD = "main form:nth-of-type(2) > p"
 NEW_PASSWORD_INPUT = "#new_password"
 CONFIRM_PASSWORD_INPUT = "#confirm_password"
 CHANGE_PASSWORD_BTN = 'main form:nth-of-type(2) button[type="submit"]'
-
-CLOSE_MODAL_BTN = 'div.fixed.inset-0 button'
 
 
 class UserProfilePage(BasePage):
@@ -215,14 +211,3 @@ class UserProfilePage(BasePage):
             ), f"An error code was expected {expected_status}, but the backend returned a code: {actual_status}"
 
         return response_info.value
-
-    def verify_profile_url(self):
-        expect(self.page).to_have_url(re.compile(r"/user/personal-information$"))
-
-    def close_modal(self):
-        modal = self.page.locator(CLOSE_MODAL_BTN)
-        try:
-            if modal.is_visible(timeout=5000):
-                modal.click()
-        except:
-            pass

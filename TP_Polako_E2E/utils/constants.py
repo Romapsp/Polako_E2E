@@ -41,7 +41,7 @@ INVALID_PASSWORD = "WrongPassword123"
 INVALID_EMAIL = "not_exist@test.com"
 
 
-TEST_EMAIL = "test355555@mail.com"
+TEST_EMAIL = "test3@mail.com"
 
 UNREGISTERED_EMAIL = "not_exist@test.com"
 VALID_TEST_PASSWORD = "Password123"

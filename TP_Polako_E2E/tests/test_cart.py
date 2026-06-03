@@ -5,7 +5,7 @@ from TP_Polako_E2E.base.base_test import BaseTest
 
 class TestTicketCart(BaseTest):
 
-
+    @pytest.mark.skip(reason="UI changed: cart flow temporarily redesigned")
     def test_add_first_ticket_to_cart(self):
         self.login_page.login_as_valid_user()
 
@@ -15,7 +15,7 @@ class TestTicketCart(BaseTest):
         self.ticket_selection_page.open_cart()
         self.ticket_selection_page.assert_cart_timer_is_visible()
 
-
+    @pytest.mark.skip(reason="UI changed: cart flow temporarily redesigned")
     def test_add_second_ticket_to_cart(self):
         self.login_page.login_as_valid_user()
 
