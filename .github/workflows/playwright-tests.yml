@@ -3,9 +3,9 @@ name: BugBusters Playwright E2E Runs
 
 on:
   push:
-    branches: [ "HW_3_Auto_BugBusters" ]
+    branches: [ "HW_3_Auto_BugBusters","develop-bb"  ]
   pull_request:
-    branches: [ "master" ]
+    branches: [ "master","develop-bb","HW_3_Auto_BugBusters" ]
 
 jobs:
   run-tests:
