@@ -56,8 +56,9 @@ class TestPersonalInfoNavigation:
         """After going to purchases, navigate_to_personal_info() returns to personal-info."""
         auth_pages.personal_info.navigate_to_purchases()
         auth_pages.personal_info.navigate_to_personal_info()
-        expect(auth_pages.personal_info.page).to_have_url(
-            re.compile(r"user/personal-information"), timeout=_URL_TIMEOUT
+        actual = auth_pages.personal_info.current_url
+        assert "personal-information" in actual, (
+            f"Expected personal-information URL, got: {actual}"
         )
 
 

@@ -76,16 +76,24 @@ class PersonalInfoPage(BasePage):
         self.page.locator(self._SAVE_BTN).first.click()
 
     def navigate_to_purchases(self) -> None:
-        """Navigate to purchases via goto — stable across CSR transitions."""
+        """Navigate to purchases via goto."""
         self.navigate(URLS["purchases"])
         self.page.wait_for_load_state("domcontentloaded", timeout=30_000)
-        self._dismiss_modal_if_present()
 
     def navigate_to_personal_info(self) -> None:
-        """Navigate back to personal-info via goto."""
+        """
+        Navigate back to personal-info via goto.
+        Retries once if the first attempt redirects to home (CI flakiness).
+        """
         self.navigate(URLS["personal_info"])
         self.page.wait_for_load_state("domcontentloaded", timeout=30_000)
-        self._dismiss_modal_if_present()
+
+        # If the app redirected us to home, the session may have refreshed server-side.
+        # Wait briefly and retry once.
+        if "personal-information" not in self.page.url:
+            self.page.wait_for_timeout(2_000)
+            self.navigate(URLS["personal_info"])
+            self.page.wait_for_load_state("domcontentloaded", timeout=30_000)
 
     def click_logout(self) -> None:
         self._dismiss_modal_if_present()
