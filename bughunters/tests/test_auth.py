@@ -1,5 +1,3 @@
-import re
-from playwright.sync_api import expect
 from bughunters.pages import Pages
 from bughunters.data.constants import MANAGER_USER
 
@@ -16,7 +14,7 @@ class TestLoginNegative:
         """Submitting empty form should not authenticate the user."""
         pages.auth.open()
         pages.auth.open_login_modal()
-        pages.auth.page.locator("button[type='submit'].btn-accent").click(force=True)
+        pages.auth.click_login_submit(force=True)
         assert not pages.auth.is_logged_in(timeout=3000), (
             "Should NOT be logged in with empty credentials"
         )
@@ -27,9 +25,7 @@ class TestLogout:
         """After logout the profile link must disappear from the header."""
         assert auth_pages_ui.auth.is_logged_in(), "Must be logged in before testing logout"
 
-        auth_pages_ui.personal_info.open()   # open() already dismisses the modal
+        auth_pages_ui.personal_info.open()
         auth_pages_ui.personal_info.click_logout()
 
-        expect(
-            auth_pages_ui.auth.page.locator("a[href*='/user']").first
-        ).not_to_be_visible(timeout=5000)
+        auth_pages_ui.auth.wait_until_logged_out(timeout=5000)

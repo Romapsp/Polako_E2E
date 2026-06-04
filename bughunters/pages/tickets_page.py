@@ -1,11 +1,8 @@
 from __future__ import annotations
-from playwright.sync_api import Page
 from .base_page import BasePage
 
 
 class TicketsPage(BasePage):
-    """Wizard создания билетов: тип → категории → сохранение."""
-
     _TYPE_NO_SEATS    = "button:has-text('Без мест')"
     _TYPE_WITH_SEATS  = "button:has-text('С местами')"
     _CONTINUE_BTN     = "button:has-text('Продолжить')"
@@ -16,9 +13,6 @@ class TicketsPage(BasePage):
     _CREATE_TICKETS   = "button:has-text('Создать билеты')"
     _SUCCESS          = "[class*='success'], :text('билеты созданы')"
     _ERROR            = "[class*='error'], .toast-error"
-
-    def __init__(self, page: Page) -> None:
-        super().__init__(page)
 
     def select_no_seats(self) -> None:
         self.click(self._TYPE_NO_SEATS)
@@ -40,7 +34,10 @@ class TicketsPage(BasePage):
         self.click(self._CREATE_TICKETS)
 
     def is_created(self) -> bool:
-        return self.page.locator(self._SUCCESS).is_visible(timeout=5_000)
+        try:
+            return self.page.locator(self._SUCCESS).is_visible(timeout=5_000)
+        except Exception:
+            return False
 
     def get_validation_error(self) -> str:
         loc = self.page.locator(self._ERROR)

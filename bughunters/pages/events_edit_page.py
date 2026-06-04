@@ -1,18 +1,10 @@
 from __future__ import annotations
-from playwright.sync_api import Page
-from .events_create_page import EventsCreatePage    # ← наследование
+from .events_create_page import EventsCreatePage
 from bughunters.data.constants import BASE_URL, LANG
 
 
 class EventsEditPage(EventsCreatePage):
-    """Inherits EventsCreatePage — та же форма, другой URL и toast."""
-
-    _SAVE_BTN      = "button:has-text('Сохранить')"
-    _SUCCESS_TOAST = "[class*='success'], :text('обновлено'), :text('сохранено')"
-    _TICKETS_BTN   = "button:has-text('Создание/редактирование билетов')"
-
-    def __init__(self, page: Page) -> None:
-        super().__init__(page)
+    _TICKETS_BTN = "button:has-text('Создание/редактирование билетов')"
 
     def open_by_id(self, event_id: str) -> None:
         self.navigate(f"{BASE_URL}/{LANG}/user/events/{event_id}/edit")

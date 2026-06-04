@@ -5,13 +5,12 @@ from dotenv import load_dotenv
 load_dotenv()
 
 BASE_URL        = "https://stg-client.polakohedonist.club"
-BASE_URL_AUTH   = "https://stg.polakohedonist.club"   # cookie domain after login redirect
+BASE_URL_AUTH   = "https://stg.polakohedonist.club"
 LANG = "ru"
 
 URLS = {
     "home":           f"{BASE_URL}/{LANG}",
     "login":          f"{BASE_URL}/{LANG}",
-    # Authenticated pages — use the post-redirect domain so the session cookie is sent
     "personal_info":  f"{BASE_URL_AUTH}/{LANG}/user/personal-information",
     "purchases":      f"{BASE_URL_AUTH}/{LANG}/user/purchases",
     "events":         f"{BASE_URL_AUTH}/{LANG}/events",
@@ -26,10 +25,13 @@ TIMEOUTS = {
     "element":    10_000,
 }
 
-MANAGER_USER = {
-    "email":    os.getenv("EMAIL"),
-    "password": os.getenv("PASSWORD"),
-}
+_email    = os.getenv("EMAIL")
+_password = os.getenv("PASSWORD")
+if not _email or not _password:
+    raise RuntimeError(
+        "EMAIL and PASSWORD must be set in .env or environment variables"
+    )
+MANAGER_USER = {"email": _email, "password": _password}
 
 NEW_USER = {
     "email":      "test_user_{}@example.com",

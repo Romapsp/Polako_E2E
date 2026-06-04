@@ -1,20 +1,16 @@
 from __future__ import annotations
 import re
-from .events_page import EventsPage        # ← наследование
+from .events_page import EventsPage
 from bughunters.data.constants import URLS
 
 
 class EventsCreatePage(EventsPage):
-    """Inherits EventsPage — переиспользует click_create, EVENT_CARD и пр."""
-
     _TITLE        = "input[name='title'], input[placeholder*='Название']"
     _DESCRIPTION  = "textarea[name='description'], textarea[placeholder*='Описание']"
     _DATE         = "input[name='date'], input[type='date']"
     _TIME         = "input[name='time'], input[type='time']"
     _LOCATION     = "input[name='location'], input[placeholder*='Место']"
     _CAPACITY     = "input[name='capacity'], input[placeholder*='Вместимость']"
-    _PUBLISH_FROM_FORM    = "button:has-text('Опубликовать')"
-    _PREVIEW_FROM_FORM    = "button:has-text('Предпросмотр')"
     _SAVE = "button:has-text('Сохранить')"
 
     def open(self) -> "EventsCreatePage":
@@ -46,12 +42,9 @@ class EventsCreatePage(EventsPage):
         self.click(self._SAVE)
 
     def is_saved(self) -> bool:
-        return (
-            self.page.get_by_role("alert", name=re.compile(r"создано|сохранено", re.IGNORECASE)).is_visible(timeout=5_000)
-        )
-
-    def publish_from_form(self) -> None:
-        self.click(self._PUBLISH_FROM_FORM)
-
-    def preview_from_form(self) -> None:
-        self.click(self._PREVIEW_FROM_FORM)
+        try:
+            return self.page.get_by_role(
+                "alert", name=re.compile(r"создано|сохранено", re.IGNORECASE),
+            ).is_visible(timeout=5_000)
+        except Exception:
+            return False
