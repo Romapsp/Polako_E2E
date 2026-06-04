@@ -3,8 +3,8 @@ name: Playwright E2E Tests
 on:
   push:
     branches:
-      - master
       - develop-bh
+      - master
   pull_request:
     branches:
       - develop-bh
