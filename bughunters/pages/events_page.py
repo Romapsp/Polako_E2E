@@ -1,26 +1,27 @@
 from __future__ import annotations
-from playwright.sync_api import Page
 from .base_page import BasePage
 from bughunters.data.constants import URLS
 
 
 class EventsPage(BasePage):
-    _CREATE_BTN    = "button:has-text('Создать мероприятие'), a:has-text('Создать мероприятие')"
     _EVENT_CARD    = "[class*='event-card'], [class*='eventCard']"
     _PUBLISH_BTN   = "button:has-text('Опубликовать')"
     _DRAFT_BTN     = "button:has-text('В черновик')"
     _PREVIEW_BTN   = "button:has-text('Предпросмотр')"
     _EDIT_BTN      = "button:has-text('Редактировать')"
     _COPY_LINK_BTN = "button:has-text('Скопировать ссылку')"
-    _BACK_BTN      = "a:has-text('Назад к мероприятиям'), button:has-text('Назад')"
     _EMPTY_STATE_CLASS = "[class*='empty']"
 
     def _get_card(self, card_index: int):
-        return self.page.locator(self._EVENT_CARD).nth(card_index)
+        loc = self.page.locator(self._EVENT_CARD).nth(card_index)
+        loc.wait_for(state="visible", timeout=self._timeout)
+        return loc
 
     def open(self) -> None:
         self.navigate(URLS["events_list"])
-        self.page.wait_for_selector(self._EVENT_CARD + ", " + self._EMPTY_STATE_CLASS)
+        self.page.locator(self._EVENT_CARD + ", " + self._EMPTY_STATE_CLASS).first.wait_for(
+            state="visible", timeout=self._timeout,
+        )
 
     def click_create(self) -> None:
         self.page.get_by_role("button", name="Создать мероприятие").or_(
@@ -52,6 +53,6 @@ class EventsPage(BasePage):
 
     def is_empty(self) -> bool:
         return (
-                self.page.locator(self._EMPTY_STATE_CLASS).is_visible()
-                or self.page.get_by_text("нет мероприятий").is_visible()
+            self.page.locator(self._EMPTY_STATE_CLASS).is_visible()
+            or self.page.get_by_text("нет мероприятий").is_visible()
         )

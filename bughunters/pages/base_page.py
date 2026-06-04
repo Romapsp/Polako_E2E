@@ -4,23 +4,60 @@ from bughunters.data.constants import TIMEOUTS
 
 
 class BasePage:
-    # Overlay selector: the "What's new" announcement modal
-    _MODAL_OVERLAY = "div[role='dialog'][aria-modal='true'], div.fixed.inset-0.z-50"
-    # The close button inside the modal (text "Закрыть" or any button inside the overlay)
+    _MODAL_OVERLAY   = "div[role='dialog'][aria-modal='true'], div.fixed.inset-0.z-50"
     _MODAL_CLOSE_BTN = "div[role='dialog'][aria-modal='true'] button[type='button']"
+
+    _HEADER_USER_LINK = "a[href*='/user']"
+    _HEADER_LOGIN_BTN = "button.ml-4"
 
     def __init__(self, page: Page) -> None:
         self.page = page
         self._timeout = TIMEOUTS["element"]
-        self._header_user_link = "a[href*='/user']"
-        self._header_login_btn = "button.ml-4"
+
+    # ── Navigation ──────────────────────────────────────────────────────────
 
     def navigate(self, url: str) -> None:
         self.page.goto(url, timeout=TIMEOUTS["navigation"])
 
+    def goto_with_retry(
+        self, url: str, expected_substring: str,
+        retries: int = 1, wait_timeout: int = 30_000,
+        stable_ms: int = 800,
+    ) -> None:
+        """Navigate and retry once if the app redirected us away (CI flakiness).
+        After the substring check, waits ``stable_ms`` to detect CSR redirects
+        triggered after the initial page load (Next.js auth-guard pattern).
+        Raises AssertionError if the final URL does not contain the expected fragment.
+        """
+        for attempt in range(retries + 1):
+            self.page.goto(url, timeout=TIMEOUTS["navigation"])
+            self.page.wait_for_load_state("domcontentloaded", timeout=wait_timeout)
+            if expected_substring in self.page.url:
+                self.page.wait_for_timeout(stable_ms)
+                if expected_substring in self.page.url:
+                    return
+            if attempt < retries:
+                self.page.wait_for_timeout(2_000)
+        raise AssertionError(
+            f"After {retries + 1} attempt(s) URL {self.page.url!r} "
+            f"does not contain {expected_substring!r}"
+        )
+
     @property
     def current_url(self) -> str:
         return self.page.url
+
+    def current_url_matches(
+        self, pattern, timeout: int | None = None,
+    ) -> bool:
+        """Auto-retrying check: current URL matches the pattern within ``timeout``."""
+        try:
+            expect(self.page).to_have_url(pattern, timeout=timeout or self._timeout)
+            return True
+        except Exception:
+            return False
+
+    # ── Low-level helpers (intended for use by page objects) ────────────────
 
     def locator(self, selector: str) -> Locator:
         return self.page.locator(selector)
@@ -44,59 +81,53 @@ class BasePage:
         loc.wait_for(state="visible", timeout=timeout or self._timeout)
         return loc
 
-    def expect_url_contains(self, fragment: str) -> None:
-        expect(self.page).to_have_url(f"**{fragment}**")
+    # ── Header ──────────────────────────────────────────────────────────────
 
-    # ── Modal helper ──────────────────────────────────────────────────────────
+    def _click_login_button(self) -> None:
+        self.page.locator(self._HEADER_LOGIN_BTN).first.click()
+
+    # ── Modal ───────────────────────────────────────────────────────────────
 
     def close_modal_if_present(self, timeout: int = 3_000) -> None:
         """Dismiss the announcement/whats-new modal if it is blocking the page.
-
-        Strategy (in order):
-          1. Click the "Закрыть" / "Close" button inside the overlay.
-          2. Fall back to pressing Escape.
-        Silently ignored when no modal is present.
+        Tries the close button, then falls back to Escape. Silently ignored
+        when no modal is present.
         """
         try:
-            overlay = self.page.locator(self._MODAL_OVERLAY).first
-            overlay.wait_for(state="visible", timeout=timeout)
+            self.page.locator(self._MODAL_OVERLAY).first.wait_for(
+                state="visible", timeout=timeout,
+            )
         except Exception:
-            return  # No modal — nothing to do
+            return
 
         try:
             close_btn = self.page.locator(self._MODAL_CLOSE_BTN).first
             close_btn.wait_for(state="visible", timeout=2_000)
             close_btn.click()
         except Exception:
-            # Button not found or not clickable — try Escape
             self.page.keyboard.press("Escape")
 
-        # Wait until overlay is gone so subsequent actions are not blocked
         try:
             self.page.locator(self._MODAL_OVERLAY).first.wait_for(
-                state="hidden", timeout=5_000
+                state="hidden", timeout=5_000,
             )
         except Exception:
-            pass  # If it doesn't disappear, the test will fail with a clear message
+            pass
 
-    # ── Header helpers ────────────────────────────────────────────────────────
-
-    def click_login_button(self) -> None:
-        self.page.locator(self._header_login_btn).first.click()
-
-    def click_profile_button(self) -> None:
-        self.page.locator(self._header_user_link).first.click()
+    # ── Auth state ──────────────────────────────────────────────────────────
 
     def is_logged_in(self, timeout: int = 10_000) -> bool:
         try:
-            self.page.locator(self._header_user_link).first.wait_for(
-                state="visible", timeout=timeout
+            self.page.locator(self._HEADER_USER_LINK).first.wait_for(
+                state="visible", timeout=timeout,
             )
             return True
         except Exception:
             return False
 
-    def logout(self) -> None:
-        self.click_profile_button()
-        logout_btn = self.page.locator("button[type='button'][class*='group/button']")
-        logout_btn.click()
+    def wait_until_logged_out(self, timeout: int = 5_000) -> None:
+        """Auto-retrying assertion: the profile link is not visible for the
+        whole window. Use after logout / session expiry."""
+        expect(self.page.locator(self._HEADER_USER_LINK).first).not_to_be_visible(
+            timeout=timeout,
+        )
